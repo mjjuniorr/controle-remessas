@@ -118,6 +118,7 @@ APP_HOST=remessas.3dhmanaus.shop
 APP_REPLICAS=1
 TRAEFIK_ENTRYPOINTS=websecure
 TRAEFIK_CERTRESOLVER=letsencryptresolver
+TRAEFIK_PRIORITY=1
 ```
 
 Requisitos da VPS:
@@ -133,11 +134,15 @@ Labels Traefik usadas em producao:
 ```text
 traefik.enable=true
 traefik.docker.network=PortainerRede
-traefik.http.routers.controle-remessas-prod.rule=Host(`${APP_HOST}`)
-traefik.http.routers.controle-remessas-prod.entrypoints=${TRAEFIK_ENTRYPOINTS}
-traefik.http.routers.controle-remessas-prod.tls=true
-traefik.http.routers.controle-remessas-prod.tls.certresolver=${TRAEFIK_CERTRESOLVER}
-traefik.http.services.controle-remessas-prod.loadbalancer.server.port=80
+traefik.http.routers.controle_remessas_app.rule=Host(`${APP_HOST}`)
+traefik.http.routers.controle_remessas_app.entrypoints=${TRAEFIK_ENTRYPOINTS}
+traefik.http.routers.controle_remessas_app.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+traefik.http.routers.controle_remessas_app.priority=${TRAEFIK_PRIORITY}
+traefik.http.routers.controle_remessas_app.service=controle_remessas_app
+traefik.http.routers.controle_remessas_app.middlewares=sslheader
+traefik.http.services.controle_remessas_app.loadbalancer.server.port=80
+traefik.http.services.controle_remessas_app.loadbalancer.passHostHeader=true
+traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https
 ```
 
 ## Build da imagem
