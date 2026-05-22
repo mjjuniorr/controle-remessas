@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Controle de Remessas</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #eef2f6;
+      --panel: #ffffff;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d9e0ea;
+      --soft: #f6f8fb;
+      --accent: #c91523;
+      --accent-dark: #9f111c;
+      --ok: #0f766e;
+      --warn: #92400e;
+      --focus: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 380px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel,
+    .shipment,
+    .empty,
+    dialog {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(23, 32, 51, 0.07);
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel h2 {
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 12px;
+      font: inherit;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    input[type="file"] {
+      padding: 10px 12px;
+    }
+
+    input:focus {
+      outline: 3px solid rgba(37, 99, 235, 0.16);
+      border-color: var(--focus);
+    }
+
+    button,
+    .link-button {
+      min-height: 40px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 13px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    button.primary {
+      min-height: 46px;
+      color: #fff;
+      background: var(--accent);
+    }
+
+    button.primary:hover {
+      background: var(--accent-dark);
+    }
+
+    button.secondary,
+    .link-button {
+      color: var(--ink);
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    button.danger {
+      color: #8f1820;
+      border: 1px solid #f2c3c7;
+      background: #fff5f6;
+    }
+
+    .message {
+      min-height: 40px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      color: var(--muted);
+      background: var(--soft);
+      line-height: 1.35;
+      font-size: 14px;
+    }
+
+    .message.error {
+      color: #8f1820;
+      background: #fff0f1;
+    }
+
+    .message.ok {
+      color: var(--ok);
+      background: #ecfdf5;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .shipments {
+      display: grid;
+      gap: 12px;
+    }
+
+    .tracking-list {
+      display: grid;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .tracking-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 62px;
+      padding: 0 12px;
+      background: #fff;
+    }
+
+    .tracking-row:nth-child(even) {
+      background: #f1f4f7;
+    }
+
+    .tracking-row a {
+      color: #0758ad;
+      font-size: 14px;
+      text-decoration: underline;
+      overflow-wrap: anywhere;
+    }
+
+    .copy-button {
+      width: 34px;
+      min-width: 34px;
+      min-height: 34px;
+      padding: 0;
+      color: #0758ad;
+      border: 0;
+      background: transparent;
+    }
+
+    .shipment {
+      padding: 16px;
+    }
+
+    .shipment-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .code {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: end;
+    }
+
+    .items {
+      display: none;
+      margin-top: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .shipment.open .items {
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: var(--soft);
+    }
+
+    td.qty {
+      width: 110px;
+      font-weight: 700;
+    }
+
+    .empty {
+      padding: 22px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    dialog {
+      width: min(760px, calc(100% - 28px));
+      padding: 0;
+    }
+
+    dialog::backdrop {
+      background: rgba(23, 32, 51, 0.36);
+    }
+
+    .modal-head,
+    .modal-body {
+      padding: 16px;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-head h2 {
+      font-size: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      border-radius: 999px;
+      padding: 0 9px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--warn);
+      background: #fffbeb;
+    }
+
+    @media (max-width: 880px) {
+      main {
+        width: min(100% - 20px, 720px);
+        padding: 18px 0;
+      }
+
+      header,
+      .grid,
+      .tools,
+      .shipment-head {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        display: grid;
+        align-items: start;
+      }
+
+      .actions {
+        justify-content: start;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Controle de Remessas</h1>
+        <p class="subtitle">Cadastre o rastreio, anexe o XML da nota fiscal e encontre os itens enviados.</p>
+      </div>
+      <button class="secondary" id="clearAllButton" type="button">Limpar cadastros</button>
+    </header>
+
+    <div class="grid">
+      <section class="panel" aria-label="Cadastro de rastreio">
+        <h2>Novo rastreio</h2>
+
+        <form id="shipmentForm">
+          <label for="trackingCode">
+            Número de rastreio
+            <input id="trackingCode" name="trackingCode" autocomplete="off" placeholder="LTM-95728114925" required>
+          </label>
+
+          <label for="invoiceFile">
+            XML da nota fiscal
+            <input id="invoiceFile" name="invoiceFile" type="file" accept=".xml,text/xml,application/xml" required>
+          </label>
+
+          <button class="primary" type="submit">Cadastrar rastreio</button>
+        </form>
+
+        <div class="message" id="formMessage" aria-live="polite">Nenhum cadastro enviado ainda.</div>
+      </section>
+
+      <div class="stack">
+        <section class="panel" aria-label="Rastreios cadastrados">
+          <h2>Rastreio</h2>
+          <div id="trackingList" class="tracking-list"></div>
+        </section>
+
+        <section aria-label="Rastreios cadastrados">
+          <div class="tools">
+            <label for="itemSearch">
+              Localizar item
+              <input id="itemSearch" autocomplete="off" placeholder="Digite parte do nome, SKU ou código">
+            </label>
+            <button class="secondary" id="searchButton" type="button">Localizar</button>
+          </div>
+
+          <div id="shipments" class="shipments"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <dialog id="searchDialog">
+    <div class="modal-head">
+      <h2>Localização do item</h2>
+      <button class="secondary" id="closeDialogButton" type="button">Fechar</button>
+    </div>
+    <div class="modal-body" id="searchResults"></div>
+  </dialog>
+
+  <script>
+    const storageKey = "simple-shipments-v1";
+    const shipmentForm = document.querySelector("#shipmentForm");
+    const trackingInput = document.querySelector("#trackingCode");
+    const invoiceInput = document.querySelector("#invoiceFile");
+    const formMessage = document.querySelector("#formMessage");
+    const shipmentsContainer = document.querySelector("#shipments");
+    const trackingListContainer = document.querySelector("#trackingList");
+    const clearAllButton = document.querySelector("#clearAllButton");
+    const itemSearch = document.querySelector("#itemSearch");
+    const searchButton = document.querySelector("#searchButton");
+    const searchDialog = document.querySelector("#searchDialog");
+    const searchResults = document.querySelector("#searchResults");
+    const closeDialogButton = document.querySelector("#closeDialogButton");
+
+    let shipments = loadShipments();
+
+    function loadShipments() {
+      try {
+        return JSON.parse(localStorage.getItem(storageKey)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveShipments() {
+      localStorage.setItem(storageKey, JSON.stringify(shipments));
+    }
+
+    function normalizeTrackingCode(value) {
+      return value.trim().toUpperCase().replace(/\s+/g, "");
+    }
+
+    function parseTrackingCode(value) {
+      const normalized = normalizeTrackingCode(value);
+      const digits = normalized.replace(/^LTM-?/, "").replace(/\D/g, "");
+
+      if (digits.length !== 11) {
+        throw new Error("O rastreio precisa ter 11 dígitos, como LTM-95728114925.");
+      }
+
+      return {
+        code: `LTM-${digits}`,
+        prefix: digits.slice(0, 3),
+        awb: digits.slice(3),
+      };
+    }
+
+    function buildLatamUrl(shipment) {
+      const url = new URL("https://www.latamcargo.com/pt/trackshipment");
+      url.searchParams.set("docNumber", shipment.awb);
+      url.searchParams.set("docPrefix", shipment.prefix);
+      url.searchParams.set("soType", "SO");
+      return url.toString();
+    }
+
+    function readFileAsText(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("Nao foi possivel ler o arquivo da nota fiscal."));
+        reader.readAsText(file);
+      });
+    }
+
+    function getNodeText(parent, tagName) {
+      return parent.getElementsByTagName(tagName)[0]?.textContent?.trim() || "";
+    }
+
+    function parseInvoiceXml(xmlText) {
+      const xml = new DOMParser().parseFromString(xmlText, "application/xml");
+      const parserError = xml.getElementsByTagName("parsererror")[0];
+
+      if (parserError) {
+        throw new Error("O XML da nota fiscal nao parece valido.");
+      }
+
+      const invoiceNumber = getNodeText(xml, "nNF") || "Sem numero";
+      const issuer = getNodeText(xml, "xNome") || "Emitente nao informado";
+      const items = Array.from(xml.getElementsByTagName("det")).map((det, index) => {
+        const product = det.getElementsByTagName("prod")[0];
+
+        return {
+          line: det.getAttribute("nItem") || String(index + 1),
+          code: getNodeText(product, "cProd") || "-",
+          description: getNodeText(product, "xProd") || "Item sem descricao",
+          quantity: formatQuantity(getNodeText(product, "qCom")),
+          unit: getNodeText(product, "uCom") || "UN",
+        };
+      });
+
+      if (!items.length) {
+        throw new Error("Nao encontrei itens no XML. Envie o XML completo da NF-e.");
+      }
+
+      return {
+        invoiceNumber,
+        issuer,
+        items,
+      };
+    }
+
+    function formatQuantity(value) {
+      const number = Number(String(value).replace(",", "."));
+
+      if (!Number.isFinite(number)) {
+        return value || "0";
+      }
+
+      return new Intl.NumberFormat("pt-BR", {
+        maximumFractionDigits: 3,
+      }).format(number);
+    }
+
+    function setMessage(message, type = "") {
+      formMessage.className = `message ${type}`.trim();
+      formMessage.textContent = message;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;",
+      })[char]);
+    }
+
+    function renderShipments() {
+      renderTrackingList();
+
+      if (!shipments.length) {
+        shipmentsContainer.innerHTML = '<div class="empty">Nenhum rastreio cadastrado.</div>';
+        return;
+      }
+
+      shipmentsContainer.innerHTML = shipments.map((shipment) => `
+        <article class="shipment" data-id="${shipment.id}">
+          <div class="shipment-head">
+            <div>
+              <div class="code">${escapeHtml(shipment.code)}</div>
+              <div class="meta">
+                NF ${escapeHtml(shipment.invoiceNumber)} · ${escapeHtml(shipment.issuer)}<br>
+                ${shipment.items.length} item(ns) cadastrado(s) · ${escapeHtml(shipment.createdAt)}
+              </div>
+            </div>
+            <div class="actions">
+              <button class="secondary" type="button" data-action="items">Ver itens</button>
+              <button class="secondary" type="button" data-action="track">Rastrear</button>
+              <button class="danger" type="button" data-action="delete">Excluir</button>
+            </div>
+          </div>
+          <div class="items">
+            ${renderItemsTable(shipment.items)}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderItemsTable(items) {
+      return `
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Codigo</th>
+              <th>Descricao</th>
+              <th>Quantidade</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map((item) => `
+              <tr>
+                <td>${escapeHtml(item.line)}</td>
+                <td>${escapeHtml(item.code)}</td>
+                <td>${escapeHtml(item.description)}</td>
+                <td class="qty">${escapeHtml(item.quantity)} ${escapeHtml(item.unit)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderTrackingList() {
+      if (!shipments.length) {
+        trackingListContainer.innerHTML = '<div class="empty">Nenhum rastreio cadastrado.</div>';
+        return;
+      }
+
+      trackingListContainer.innerHTML = shipments.map((shipment) => `
+        <div class="tracking-row" data-id="${shipment.id}">
+          <a href="${buildLatamUrl(shipment)}" target="_blank" rel="noopener">${escapeHtml(shipment.code)}</a>
+          <button class="copy-button" type="button" data-action="copy" aria-label="Copiar ${escapeHtml(shipment.code)}" title="Copiar rastreio">
+            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+              <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path>
+            </svg>
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function renderSearchResults(term) {
+      const normalized = term.trim().toLowerCase();
+
+      if (!normalized) {
+        searchResults.innerHTML = '<p class="message error">Digite um nome, SKU ou codigo para localizar.</p>';
+        searchDialog.showModal();
+        return;
+      }
+
+      const matches = [];
+
+      shipments.forEach((shipment) => {
+        shipment.items.forEach((item) => {
+          const content = `${item.code} ${item.description}`.toLowerCase();
+
+          if (content.includes(normalized)) {
+            matches.push({ shipment, item });
+          }
+        });
+      });
+
+      if (!matches.length) {
+        searchResults.innerHTML = '<p class="message">Nenhum item encontrado nos rastreios cadastrados.</p>';
+        searchDialog.showModal();
+        return;
+      }
+
+      searchResults.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Item localizado</th>
+              <th>Quantidade</th>
+              <th>Esta no envio</th>
+              <th>NF</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${matches.map(({ shipment, item }) => `
+              <tr>
+                <td><strong>${escapeHtml(item.description)}</strong><br>${escapeHtml(item.code)}</td>
+                <td class="qty">${escapeHtml(item.quantity)} ${escapeHtml(item.unit)}</td>
+                <td><span class="badge">${escapeHtml(shipment.code)}</span></td>
+                <td>${escapeHtml(shipment.invoiceNumber)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+      searchDialog.showModal();
+    }
+
+    shipmentForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setMessage("Lendo nota fiscal...");
+
+      try {
+        const tracking = parseTrackingCode(trackingInput.value);
+        const file = invoiceInput.files[0];
+
+        if (!file) {
+          throw new Error("Selecione o XML da nota fiscal.");
+        }
+
+        const xmlText = await readFileAsText(file);
+        const invoice = parseInvoiceXml(xmlText);
+        const shipment = {
+          id: crypto.randomUUID(),
+          ...tracking,
+          ...invoice,
+          fileName: file.name,
+          createdAt: new Intl.DateTimeFormat("pt-BR", {
+            dateStyle: "short",
+            timeStyle: "short",
+          }).format(new Date()),
+        };
+
+        shipments.unshift(shipment);
+        saveShipments();
+        renderShipments();
+        shipmentForm.reset();
+        setMessage(`Rastreio cadastrado com ${shipment.items.length} item(ns).`, "ok");
+      } catch (error) {
+        setMessage(error.message, "error");
+      }
+    });
+
+    shipmentsContainer.addEventListener("click", (event) => {
+      const button = event.target.closest("button");
+
+      if (!button) {
+        return;
+      }
+
+      const shipmentElement = button.closest(".shipment");
+      const shipmentId = shipmentElement?.dataset.id;
+      const action = button.dataset.action;
+
+      if (action === "items") {
+        shipmentElement.classList.toggle("open");
+        button.textContent = shipmentElement.classList.contains("open") ? "Ocultar itens" : "Ver itens";
+      }
+
+      if (action === "track") {
+        const shipment = shipments.find((item) => item.id === shipmentId);
+
+        if (shipment) {
+          window.open(buildLatamUrl(shipment), "_blank", "noopener");
+        }
+      }
+
+      if (action === "delete") {
+        shipments = shipments.filter((shipment) => shipment.id !== shipmentId);
+        saveShipments();
+        renderShipments();
+      }
+    });
+
+    trackingListContainer.addEventListener("click", async (event) => {
+      const button = event.target.closest("button");
+
+      if (!button || button.dataset.action !== "copy") {
+        return;
+      }
+
+      const shipmentId = button.closest(".tracking-row")?.dataset.id;
+      const shipment = shipments.find((item) => item.id === shipmentId);
+
+      if (!shipment) {
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(shipment.code);
+        setMessage(`Rastreio ${shipment.code} copiado.`, "ok");
+      } catch {
+        setMessage(`Rastreio para copiar: ${shipment.code}`);
+      }
+    });
+
+    searchButton.addEventListener("click", () => {
+      renderSearchResults(itemSearch.value);
+    });
+
+    itemSearch.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        renderSearchResults(itemSearch.value);
+      }
+    });
+
+    closeDialogButton.addEventListener("click", () => {
+      searchDialog.close();
+    });
+
+    clearAllButton.addEventListener("click", () => {
+      if (!shipments.length) {
+        setMessage("Nao ha cadastros para limpar.");
+        return;
+      }
+
+      shipments = [];
+      saveShipments();
+      renderShipments();
+      setMessage("Cadastros removidos.", "ok");
+    });
+
+    renderShipments();
+  </script>
+</body>
+</html>

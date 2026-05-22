@@ -1,0 +1,22 @@
+services:
+  remessas-web:
+    image: ${APP_IMAGE:?configure APP_IMAGE com a imagem publicada no registry}
+    networks:
+      - PortainerRede
+    deploy:
+      replicas: ${APP_REPLICAS:-1}
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=PortainerRede
+        - traefik.http.routers.controle-remessas-prod.rule=Host(`${APP_HOST:-remessas.3dhmanaus.shop}`)
+        - traefik.http.routers.controle-remessas-prod.entrypoints=${TRAEFIK_ENTRYPOINTS:-websecure}
+        - traefik.http.routers.controle-remessas-prod.tls=true
+        - traefik.http.routers.controle-remessas-prod.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencryptresolver}
+        - traefik.http.services.controle-remessas-prod.loadbalancer.server.port=80
+
+networks:
+  PortainerRede:
+    external: true
+    name: PortainerRede

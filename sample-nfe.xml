@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+  <NFe>
+    <infNFe Id="NFe123">
+      <ide>
+        <nNF>12345</nNF>
+      </ide>
+      <emit>
+        <xNome>3DH Manaus</xNome>
+      </emit>
+      <det nItem="1">
+        <prod>
+          <cProd>CAM-001</cProd>
+          <xProd>Camera de monitoramento</xProd>
+          <qCom>2.0000</qCom>
+          <uCom>UN</uCom>
+        </prod>
+      </det>
+      <det nItem="2">
+        <prod>
+          <cProd>SEN-010</cProd>
+          <xProd>Sensor de temperatura</xProd>
+          <qCom>5.0000</qCom>
+          <uCom>UN</uCom>
+        </prod>
+      </det>
+    </infNFe>
+  </NFe>
+</nfeProc>
