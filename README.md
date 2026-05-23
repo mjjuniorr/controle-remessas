@@ -136,6 +136,7 @@ traefik.enable=true
 traefik.docker.network=PortainerRede
 traefik.http.routers.controle_remessas_app.rule=Host(`${APP_HOST}`)
 traefik.http.routers.controle_remessas_app.entrypoints=${TRAEFIK_ENTRYPOINTS}
+traefik.http.routers.controle_remessas_app.tls=true
 traefik.http.routers.controle_remessas_app.tls.certresolver=${TRAEFIK_CERTRESOLVER}
 traefik.http.routers.controle_remessas_app.priority=${TRAEFIK_PRIORITY}
 traefik.http.routers.controle_remessas_app.service=controle_remessas_app
