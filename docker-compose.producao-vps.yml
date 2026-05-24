@@ -1,6 +1,6 @@
 services:
   remessas-web:
-    image: ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
+    image: ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
     networks:
       - PortainerRede
     deploy:

@@ -111,7 +111,7 @@ O arquivo `docker-compose.producao-vps.yml` foi preparado para uso como Stack no
 Ele usa a imagem de producao ja publicada no GHCR:
 
 ```text
-ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
+ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
 ```
 
 Variaveis principais:
@@ -160,8 +160,8 @@ docker build -t controle-remessas-web:latest .
 Exemplo para publicar em registry:
 
 ```bash
-docker tag controle-remessas-web:latest ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
-docker push ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
+docker tag controle-remessas-web:latest ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
+docker push ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
 ```
 
 ## Limitacoes da primeira versao
