@@ -361,16 +361,6 @@
       text-underline-offset: 3px;
     }
 
-    .copy-button {
-      width: 34px;
-      min-width: 34px;
-      min-height: 34px;
-      padding: 0;
-      color: var(--cyan);
-      border: 0;
-      background: transparent;
-    }
-
     .shipment {
       padding: 16px;
     }
@@ -576,7 +566,6 @@
         </div>
         <div class="header-actions">
           <button class="secondary" id="logoutButton" type="button">Sair</button>
-          <button class="secondary" id="clearAllButton" type="button">Limpar cadastros</button>
         </div>
       </header>
 
@@ -602,11 +591,6 @@
       </section>
 
       <div class="stack">
-        <section class="panel" aria-label="Rastreios cadastrados">
-          <h2>Rastreio</h2>
-          <div id="trackingList" class="tracking-list"></div>
-        </section>
-
         <section aria-label="Rastreios cadastrados">
           <div class="tools">
             <label for="itemSearch">
@@ -643,8 +627,6 @@
     const invoiceInput = document.querySelector("#invoiceFile");
     const formMessage = document.querySelector("#formMessage");
     const shipmentsContainer = document.querySelector("#shipments");
-    const trackingListContainer = document.querySelector("#trackingList");
-    const clearAllButton = document.querySelector("#clearAllButton");
     const logoutButton = document.querySelector("#logoutButton");
     const itemSearch = document.querySelector("#itemSearch");
     const searchButton = document.querySelector("#searchButton");
@@ -850,8 +832,6 @@
     }
 
     function renderShipments() {
-      renderTrackingList();
-
       if (!shipments.length) {
         shipmentsContainer.innerHTML = '<div class="empty">Nenhum rastreio cadastrado.</div>';
         return;
@@ -907,25 +887,6 @@
           </tbody>
         </table>
       `;
-    }
-
-    function renderTrackingList() {
-      if (!shipments.length) {
-        trackingListContainer.innerHTML = '<div class="empty">Nenhum rastreio cadastrado.</div>';
-        return;
-      }
-
-      trackingListContainer.innerHTML = shipments.map((shipment) => `
-        <div class="tracking-row" data-id="${shipment.id}">
-          <a href="${buildTrackingUrl(shipment)}" target="_blank" rel="noopener">${escapeHtml(shipment.code)}</a>
-          <button class="copy-button" type="button" data-action="copy" aria-label="Copiar ${escapeHtml(shipment.code)}" title="Copiar rastreio">
-            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="8" y="8" width="12" height="12" rx="2"></rect>
-              <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path>
-            </svg>
-          </button>
-        </div>
-      `).join("");
     }
 
     function renderShipmentMeta(shipment) {
@@ -1108,28 +1069,6 @@
       }
     });
 
-    trackingListContainer.addEventListener("click", async (event) => {
-      const button = event.target.closest("button");
-
-      if (!button || button.dataset.action !== "copy") {
-        return;
-      }
-
-      const shipmentId = button.closest(".tracking-row")?.dataset.id;
-      const shipment = shipments.find((item) => item.id === shipmentId);
-
-      if (!shipment) {
-        return;
-      }
-
-      try {
-        await navigator.clipboard.writeText(shipment.code);
-        setMessage(`Rastreio ${shipment.code} copiado.`, "ok");
-      } catch {
-        setMessage(`Rastreio para copiar: ${shipment.code}`);
-      }
-    });
-
     searchButton.addEventListener("click", () => {
       renderSearchResults(itemSearch.value);
     });
@@ -1142,22 +1081,6 @@
 
     closeDialogButton.addEventListener("click", () => {
       searchDialog.close();
-    });
-
-    clearAllButton.addEventListener("click", async () => {
-      if (!shipments.length) {
-        setMessage("Nao ha cadastros para limpar.");
-        return;
-      }
-
-      try {
-        await apiRequest("/api/shipments", { method: "DELETE" });
-        shipments = [];
-        renderShipments();
-        setMessage("Cadastros removidos.", "ok");
-      } catch (error) {
-        setMessage(error.message, "error");
-      }
     });
 
     renderShipments();
