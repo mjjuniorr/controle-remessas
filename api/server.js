@@ -137,10 +137,16 @@ function normalizeShipment(input) {
   }
 
   const items = Array.isArray(input.items) ? input.items : [];
+  const digits = code.replace(/^LTM-?/, "").replace(/\D/g, "");
+  const latamFields = carrier === "LATAM Cargo" && digits.length === 11
+    ? { prefix: input.prefix || digits.slice(0, 3), awb: input.awb || digits.slice(3) }
+    : {};
+
   return {
     id: String(input.id || randomUUID()),
     code,
     carrier,
+    ...latamFields,
     invoiceNumber: String(input.invoiceNumber || "Sem nota"),
     issuer: String(input.issuer || "Nao informado"),
     fileName: String(input.fileName || "Sem XML"),
@@ -150,7 +156,7 @@ function normalizeShipment(input) {
 }
 
 function rowToShipment(row) {
-  return {
+  return normalizeShipment({
     ...row.payload,
     id: row.id,
     code: row.code,
@@ -159,7 +165,7 @@ function rowToShipment(row) {
     issuer: row.issuer,
     fileName: row.file_name,
     items: row.items || [],
-  };
+  });
 }
 
 async function listShipments() {

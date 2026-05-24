@@ -751,9 +751,12 @@
         return url.toString();
       }
 
+      const digits = String(shipment.code || "").replace(/^LTM-?/i, "").replace(/\D/g, "");
+      const prefix = shipment.prefix || digits.slice(0, 3);
+      const awb = shipment.awb || digits.slice(3);
       const url = new URL("https://www.latamcargo.com/pt/trackshipment");
-      url.searchParams.set("docNumber", shipment.awb);
-      url.searchParams.set("docPrefix", shipment.prefix);
+      url.searchParams.set("docNumber", awb);
+      url.searchParams.set("docPrefix", prefix);
       url.searchParams.set("soType", "SO");
       return url.toString();
     }
