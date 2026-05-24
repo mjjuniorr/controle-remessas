@@ -3,21 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Controle de Remessas</title>
+  <title>3DH Manaus | Controle de Remessas</title>
   <style>
     :root {
       color-scheme: light;
-      --bg: #eef2f6;
+      --bg: #f3f5f7;
       --panel: #ffffff;
-      --ink: #172033;
-      --muted: #667085;
-      --line: #d9e0ea;
-      --soft: #f6f8fb;
-      --accent: #c91523;
-      --accent-dark: #9f111c;
-      --ok: #0f766e;
-      --warn: #92400e;
-      --focus: #2563eb;
+      --ink: #1d2633;
+      --muted: #66717f;
+      --line: #dfe5eb;
+      --soft: #f8fafc;
+      --brand-blue: #006bb6;
+      --brand-blue-dark: #004d86;
+      --brand-orange: #f28c20;
+      --brand-green: #38a84b;
+      --accent: var(--brand-blue);
+      --accent-dark: var(--brand-blue-dark);
+      --ok: #168149;
+      --warn: #b76512;
+      --focus: #0085d5;
     }
 
     * {
@@ -28,7 +32,9 @@
       margin: 0;
       min-height: 100vh;
       font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
+      background:
+        linear-gradient(180deg, rgba(0, 107, 182, 0.10), rgba(243, 245, 247, 0) 260px),
+        var(--bg);
       color: var(--ink);
     }
 
@@ -38,12 +44,41 @@
       padding: 28px 0;
     }
 
+    .topbar {
+      background: #1d2633;
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .topbar-inner {
+      width: min(1180px, calc(100% - 32px));
+      min-height: 38px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .topbar strong {
+      color: #fff;
+    }
+
+    .topbar span {
+      color: #cfd7df;
+    }
+
     header {
       display: flex;
       justify-content: space-between;
       gap: 16px;
-      align-items: end;
-      margin-bottom: 18px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(29, 38, 51, 0.08);
     }
 
     h1,
@@ -54,8 +89,38 @@
     }
 
     h1 {
-      font-size: 28px;
+      font-size: 24px;
       line-height: 1.15;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 58px;
+      min-width: 58px;
+      height: 58px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 900;
+      background:
+        linear-gradient(135deg, var(--brand-blue) 0 52%, var(--brand-orange) 52% 75%, var(--brand-green) 75% 100%);
+      box-shadow: inset 0 -8px 0 rgba(0, 0, 0, 0.10);
+    }
+
+    .eyebrow {
+      color: var(--brand-blue);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
     }
 
     .subtitle {
@@ -78,7 +143,7 @@
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: 0 10px 24px rgba(23, 32, 51, 0.07);
+      box-shadow: 0 10px 24px rgba(29, 38, 51, 0.07);
     }
 
     .panel {
@@ -93,6 +158,8 @@
     .panel h2 {
       font-size: 18px;
       margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid var(--brand-orange);
     }
 
     form {
@@ -157,9 +224,15 @@
 
     button.secondary,
     .link-button {
-      color: var(--ink);
+      color: var(--brand-blue);
       border: 1px solid var(--line);
       background: #fff;
+    }
+
+    button.secondary:hover,
+    .link-button:hover {
+      border-color: rgba(0, 107, 182, 0.38);
+      background: #f2f9ff;
     }
 
     button.danger {
@@ -185,7 +258,7 @@
 
     .message.ok {
       color: var(--ok);
-      background: #ecfdf5;
+      background: #eefaf1;
     }
 
     .tools {
@@ -218,11 +291,11 @@
     }
 
     .tracking-row:nth-child(even) {
-      background: #f1f4f7;
+      background: #f5f8fb;
     }
 
     .tracking-row a {
-      color: #0758ad;
+      color: var(--brand-blue);
       font-size: 14px;
       text-decoration: underline;
       overflow-wrap: anywhere;
@@ -233,7 +306,7 @@
       min-width: 34px;
       min-height: 34px;
       padding: 0;
-      color: #0758ad;
+      color: var(--brand-blue);
       border: 0;
       background: transparent;
     }
@@ -254,6 +327,7 @@
       font-weight: 800;
       letter-spacing: 0;
       overflow-wrap: anywhere;
+      color: var(--brand-blue-dark);
     }
 
     .meta {
@@ -349,7 +423,26 @@
       font-size: 12px;
       font-weight: 800;
       color: var(--warn);
-      background: #fffbeb;
+      background: #fff7ed;
+    }
+
+    .category-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .category-strip span {
+      min-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 0 10px;
+      color: var(--brand-blue-dark);
+      background: #eaf6ff;
+      font-size: 12px;
+      font-weight: 800;
     }
 
     @media (max-width: 880px) {
@@ -358,7 +451,6 @@
         padding: 18px 0;
       }
 
-      header,
       .grid,
       .tools,
       .shipment-head {
@@ -370,6 +462,17 @@
         align-items: start;
       }
 
+      .topbar-inner {
+        width: min(100% - 20px, 720px);
+        align-items: start;
+        flex-direction: column;
+        padding: 8px 0;
+      }
+
+      .brand {
+        align-items: start;
+      }
+
       .actions {
         justify-content: start;
       }
@@ -378,11 +481,28 @@
   </style>
 </head>
 <body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <strong>3DH Manaus</strong>
+      <span>Controle interno de remessas, notas fiscais e itens enviados</span>
+    </div>
+  </div>
+
   <main>
     <header>
-      <div>
-        <h1>Controle de Remessas</h1>
-        <p class="subtitle">Cadastre o rastreio, anexe o XML da nota fiscal e encontre os itens enviados.</p>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">3DH</div>
+        <div>
+          <p class="eyebrow">Casa da Impressora 3D</p>
+          <h1>Controle de Remessas</h1>
+          <p class="subtitle">Acompanhe rastreios, NF-e e itens enviados para operações de filamentos, peças, impressoras e serviços.</p>
+          <div class="category-strip" aria-label="Categorias atendidas">
+            <span>Filamentos</span>
+            <span>Impressoras 3D</span>
+            <span>Peças</span>
+            <span>Serviços</span>
+          </div>
+        </div>
       </div>
       <button class="secondary" id="clearAllButton" type="button">Limpar cadastros</button>
     </header>
