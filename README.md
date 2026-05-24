@@ -119,8 +119,8 @@ O arquivo `docker-compose.producao-vps.yml` foi preparado para uso como Stack no
 Ele usa a imagem de producao ja publicada no GHCR:
 
 ```text
-ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
-ghcr.io/mjjuniorr/controle-remessas-api:e5d7e78
+ghcr.io/mjjuniorr/controle-remessas-web:ef83c7e
+ghcr.io/mjjuniorr/controle-remessas-api:ef83c7e
 ```
 
 Variaveis principais:
@@ -181,10 +181,10 @@ docker build -t controle-remessas-api:latest ./api
 Exemplo para publicar em registry:
 
 ```bash
-docker tag controle-remessas-web:latest ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
-docker push ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
-docker tag controle-remessas-api:latest ghcr.io/mjjuniorr/controle-remessas-api:e5d7e78
-docker push ghcr.io/mjjuniorr/controle-remessas-api:e5d7e78
+docker tag controle-remessas-web:latest ghcr.io/mjjuniorr/controle-remessas-web:ef83c7e
+docker push ghcr.io/mjjuniorr/controle-remessas-web:ef83c7e
+docker tag controle-remessas-api:latest ghcr.io/mjjuniorr/controle-remessas-api:ef83c7e
+docker push ghcr.io/mjjuniorr/controle-remessas-api:ef83c7e
 ```
 
 ## API interna

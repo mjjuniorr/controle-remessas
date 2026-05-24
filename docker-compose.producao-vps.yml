@@ -15,7 +15,7 @@ services:
         condition: on-failure
 
   remessas-api:
-    image: ghcr.io/mjjuniorr/controle-remessas-api:e5d7e78
+    image: ghcr.io/mjjuniorr/controle-remessas-api:ef83c7e
     networks:
       - PortainerRede
     environment:
@@ -31,7 +31,7 @@ services:
         condition: on-failure
 
   remessas-web:
-    image: ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
+    image: ghcr.io/mjjuniorr/controle-remessas-web:ef83c7e
     networks:
       - PortainerRede
     deploy:
