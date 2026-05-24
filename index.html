@@ -575,7 +575,6 @@
           </div>
         </div>
         <div class="header-actions">
-          <button class="secondary hidden" id="importLocalButton" type="button">Importar deste navegador</button>
           <button class="secondary" id="logoutButton" type="button">Sair</button>
           <button class="secondary" id="clearAllButton" type="button">Limpar cadastros</button>
         </div>
@@ -633,7 +632,6 @@
   </dialog>
 
   <script>
-    const storageKey = "simple-shipments-v1";
     const authKey = "controle-remessas-token";
     const appShell = document.querySelector("#appShell");
     const loginScreen = document.querySelector("#loginScreen");
@@ -648,7 +646,6 @@
     const trackingListContainer = document.querySelector("#trackingList");
     const clearAllButton = document.querySelector("#clearAllButton");
     const logoutButton = document.querySelector("#logoutButton");
-    const importLocalButton = document.querySelector("#importLocalButton");
     const itemSearch = document.querySelector("#itemSearch");
     const searchButton = document.querySelector("#searchButton");
     const searchDialog = document.querySelector("#searchDialog");
@@ -676,18 +673,6 @@
 
     function removeStorageItem(key) {
       getStorage()?.removeItem(key);
-    }
-
-    function loadLocalShipments() {
-      try {
-        return JSON.parse(getStorageItem(storageKey) || "[]") || [];
-      } catch {
-        return [];
-      }
-    }
-
-    function saveLocalBackup() {
-      setStorageItem(storageKey, JSON.stringify(shipments));
     }
 
     function setLoginMessage(text, type = "") {
@@ -725,16 +710,10 @@
       passwordInput.focus();
     }
 
-    function updateImportButton() {
-      const localShipments = loadLocalShipments();
-      importLocalButton.classList.toggle("hidden", localShipments.length === 0);
-    }
-
     async function loadSharedShipments() {
       const data = await apiRequest("/api/shipments");
       shipments = data.shipments || [];
       renderShipments();
-      updateImportButton();
     }
 
     async function boot() {
@@ -1045,31 +1024,6 @@
       setLoginMessage("Sessao encerrada.", "ok");
     });
 
-    importLocalButton.addEventListener("click", async () => {
-      const localShipments = loadLocalShipments();
-
-      if (!localShipments.length) {
-        setMessage("Nao ha cadastros locais para importar.");
-        updateImportButton();
-        return;
-      }
-
-      try {
-        setMessage("Importando cadastros deste navegador...");
-        const data = await apiRequest("/api/shipments/import", {
-          method: "POST",
-          body: JSON.stringify({ shipments: localShipments }),
-        });
-        shipments = data.shipments || [];
-        saveLocalBackup();
-        renderShipments();
-        updateImportButton();
-        setMessage(`${data.imported} cadastro(s) importado(s) para o banco compartilhado.`, "ok");
-      } catch (error) {
-        setMessage(error.message, "error");
-      }
-    });
-
     shipmentForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       setMessage("Lendo nota fiscal...");
@@ -1108,7 +1062,6 @@
           body: JSON.stringify(shipment),
         });
         shipments.unshift(shipment);
-        saveLocalBackup();
         renderShipments();
         shipmentForm.reset();
         setMessage(`Rastreio cadastrado com ${shipment.items.length} item(ns).`, "ok");
@@ -1147,7 +1100,6 @@
             method: "DELETE",
           });
           shipments = shipments.filter((shipment) => shipment.id !== shipmentId);
-          saveLocalBackup();
           renderShipments();
           setMessage("Rastreio removido.", "ok");
         } catch (error) {
@@ -1201,7 +1153,6 @@
       try {
         await apiRequest("/api/shipments", { method: "DELETE" });
         shipments = [];
-        saveLocalBackup();
         renderShipments();
         setMessage("Cadastros removidos.", "ok");
       } catch (error) {

@@ -242,19 +242,6 @@ async function handle(req, res) {
       return;
     }
 
-    if (url.pathname === "/api/shipments/import" && req.method === "POST") {
-      if (!requireAuth(req, res)) return;
-      const body = await readJson(req);
-      const shipments = Array.isArray(body.shipments) ? body.shipments : [];
-
-      for (const shipment of shipments) {
-        await upsertShipment(shipment);
-      }
-
-      send(res, 200, { imported: shipments.length, shipments: await listShipments() });
-      return;
-    }
-
     if (url.pathname === "/api/shipments" && req.method === "DELETE") {
       if (!requireAuth(req, res)) return;
       await pool.query("delete from shipments");

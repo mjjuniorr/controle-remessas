@@ -54,7 +54,6 @@ Sistema simples para cadastrar rastreios de envio, anexar o XML da nota fiscal e
 - Os cadastros devem ficar salvos em banco de dados centralizado.
 - Todos os usuarios autenticados devem visualizar a mesma base de rastreios.
 - A senha deve proteger o acesso ao sistema.
-- O sistema deve permitir importar cadastros antigos que ainda existam no navegador.
 - O sistema deve permitir limpar todos os cadastros compartilhados.
 
 ## Tecnologia utilizada
@@ -64,7 +63,7 @@ Sistema simples para cadastrar rastreios de envio, anexar o XML da nota fiscal e
 - **JavaScript puro**: regras de cadastro, leitura da nota, busca e interacao da tela.
 - **DOMParser**: leitura e interpretacao do XML da NF-e.
 - **FileReader API**: leitura do arquivo XML selecionado pelo usuario.
-- **localStorage**: armazenamento temporario do token e apoio para importar cadastros antigos do navegador.
+- **localStorage**: armazenamento temporario do token de acesso no navegador.
 - **Node.js**: backend da API.
 - **PostgreSQL**: banco de dados centralizado dos rastreios.
 - **pg**: driver PostgreSQL usado pela API Node.
@@ -202,7 +201,6 @@ Endpoints principais:
 - `GET /api/me`: valida o token de login.
 - `GET /api/shipments`: lista todos os rastreios cadastrados.
 - `POST /api/shipments`: cadastra ou atualiza um rastreio.
-- `POST /api/shipments/import`: importa cadastros antigos do navegador.
 - `DELETE /api/shipments/:id`: remove um rastreio.
 - `DELETE /api/shipments`: limpa todos os rastreios.
 
