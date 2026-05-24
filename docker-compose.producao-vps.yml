@@ -1,6 +1,6 @@
 services:
   remessas-web:
-    image: ${APP_IMAGE:?configure APP_IMAGE com a imagem publicada no registry}
+    image: ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
     networks:
       - PortainerRede
     deploy:

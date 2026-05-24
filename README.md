@@ -104,16 +104,15 @@ APP_PORT=8080 docker compose -f docker-compose.homologacao-pc.yml up --build
 
 O arquivo `docker-compose.producao-vps.yml` foi preparado para uso como Stack no Portainer.
 
-Ele espera que a imagem ja esteja publicada em um registry:
+Ele usa a imagem de producao ja publicada no GHCR:
 
 ```text
-APP_IMAGE=ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
+ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
 ```
 
 Variaveis principais:
 
 ```text
-APP_IMAGE=ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
 APP_HOST=remessas.3dhmanaus.shop
 APP_REPLICAS=1
 TRAEFIK_ENTRYPOINTS=websecure
