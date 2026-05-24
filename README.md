@@ -8,16 +8,19 @@ Sistema simples para cadastrar rastreios de envio, anexar o XML da nota fiscal e
 
 - O usuario deve informar um numero de rastreio.
 - O sistema deve aceitar rastreios no formato `LTM-95728114925`.
+- O sistema deve aceitar rastreios dos Correios no formato `AA123456789BR`.
 - O sistema deve identificar automaticamente:
   - prefixo do documento: `957`;
   - numero AWB: `28114925`;
   - tipo de consulta LATAM: `SO`.
-- O sistema deve gerar o link oficial de rastreio da LATAM Cargo.
+- O sistema deve identificar automaticamente se o rastreio e LATAM Cargo ou Correios.
+- O sistema deve gerar o link oficial de rastreio da transportadora correta.
 - O botao **Rastrear** deve abrir o link oficial em outra aba.
 
 ### Upload da nota fiscal
 
-- O usuario deve anexar o XML da NF-e referente ao material enviado.
+- Para rastreios LATAM Cargo, o usuario deve anexar o XML da NF-e referente ao material enviado.
+- Para rastreios dos Correios, o XML da NF-e nao deve ser obrigatorio.
 - O sistema deve ler o XML diretamente no navegador.
 - O sistema deve extrair:
   - numero da nota fiscal;
@@ -60,7 +63,8 @@ Sistema simples para cadastrar rastreios de envio, anexar o XML da nota fiscal e
 - **DOMParser**: leitura e interpretacao do XML da NF-e.
 - **FileReader API**: leitura do arquivo XML selecionado pelo usuario.
 - **localStorage**: armazenamento local dos rastreios cadastrados no navegador.
-- **LATAM Cargo Tracking URL**: abertura do rastreio oficial em outra aba.
+- **LATAM Cargo Tracking URL**: abertura do rastreio oficial LATAM em outra aba.
+- **Correios Tracking URL**: abertura do rastreio oficial Correios em outra aba.
 - **Docker**: empacotamento da aplicacao para homologacao e producao.
 - **Nginx Alpine**: servidor web usado dentro do container.
 - **Docker Compose**: execucao local em homologacao no PC.

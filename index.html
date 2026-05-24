@@ -508,12 +508,12 @@
         <form id="shipmentForm">
           <label for="trackingCode">
             Número de rastreio
-            <input id="trackingCode" name="trackingCode" autocomplete="off" placeholder="LTM-95728114925" required>
+            <input id="trackingCode" name="trackingCode" autocomplete="off" placeholder="LTM-95728114925 ou AA123456789BR" required>
           </label>
 
           <label for="invoiceFile">
             XML da nota fiscal
-            <input id="invoiceFile" name="invoiceFile" type="file" accept=".xml,text/xml,application/xml" required>
+            <input id="invoiceFile" name="invoiceFile" type="file" accept=".xml,text/xml,application/xml">
           </label>
 
           <button class="primary" type="submit">Cadastrar rastreio</button>
@@ -586,20 +586,36 @@
 
     function parseTrackingCode(value) {
       const normalized = normalizeTrackingCode(value);
+      const correiosCode = normalized.replace(/[^A-Z0-9]/g, "");
+
+      if (/^[A-Z]{2}\d{9}[A-Z]{2}$/.test(correiosCode)) {
+        return {
+          carrier: "Correios",
+          code: correiosCode,
+        };
+      }
+
       const digits = normalized.replace(/^LTM-?/, "").replace(/\D/g, "");
 
       if (digits.length !== 11) {
-        throw new Error("O rastreio precisa ter 11 dígitos, como LTM-95728114925.");
+        throw new Error("Use um rastreio LATAM como LTM-95728114925 ou Correios como AA123456789BR.");
       }
 
       return {
+        carrier: "LATAM Cargo",
         code: `LTM-${digits}`,
         prefix: digits.slice(0, 3),
         awb: digits.slice(3),
       };
     }
 
-    function buildLatamUrl(shipment) {
+    function buildTrackingUrl(shipment) {
+      if (shipment.carrier === "Correios") {
+        const url = new URL("https://rastreamento.correios.com.br/app/index.php");
+        url.searchParams.set("objetos", shipment.code);
+        return url.toString();
+      }
+
       const url = new URL("https://www.latamcargo.com/pt/trackshipment");
       url.searchParams.set("docNumber", shipment.awb);
       url.searchParams.set("docPrefix", shipment.prefix);
@@ -694,7 +710,7 @@
             <div>
               <div class="code">${escapeHtml(shipment.code)}</div>
               <div class="meta">
-                NF ${escapeHtml(shipment.invoiceNumber)} · ${escapeHtml(shipment.issuer)}<br>
+                ${escapeHtml(shipment.carrier || "LATAM Cargo")} · ${renderShipmentMeta(shipment)}<br>
                 ${shipment.items.length} item(ns) cadastrado(s) · ${escapeHtml(shipment.createdAt)}
               </div>
             </div>
@@ -712,6 +728,10 @@
     }
 
     function renderItemsTable(items) {
+      if (!items.length) {
+        return '<div class="empty">Este rastreio nao possui XML ou itens vinculados.</div>';
+      }
+
       return `
         <table>
           <thead>
@@ -744,7 +764,7 @@
 
       trackingListContainer.innerHTML = shipments.map((shipment) => `
         <div class="tracking-row" data-id="${shipment.id}">
-          <a href="${buildLatamUrl(shipment)}" target="_blank" rel="noopener">${escapeHtml(shipment.code)}</a>
+          <a href="${buildTrackingUrl(shipment)}" target="_blank" rel="noopener">${escapeHtml(shipment.code)}</a>
           <button class="copy-button" type="button" data-action="copy" aria-label="Copiar ${escapeHtml(shipment.code)}" title="Copiar rastreio">
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <rect x="8" y="8" width="12" height="12" rx="2"></rect>
@@ -753,6 +773,14 @@
           </button>
         </div>
       `).join("");
+    }
+
+    function renderShipmentMeta(shipment) {
+      if (shipment.carrier === "Correios") {
+        return "Sem XML obrigatório";
+      }
+
+      return `NF ${escapeHtml(shipment.invoiceNumber)} · ${escapeHtml(shipment.issuer)}`;
     }
 
     function renderSearchResults(term) {
@@ -814,18 +842,26 @@
       try {
         const tracking = parseTrackingCode(trackingInput.value);
         const file = invoiceInput.files[0];
+        let invoice = {
+          invoiceNumber: "Sem nota",
+          issuer: "Nao informado",
+          items: [],
+        };
 
-        if (!file) {
+        if (tracking.carrier === "LATAM Cargo" && !file) {
           throw new Error("Selecione o XML da nota fiscal.");
         }
 
-        const xmlText = await readFileAsText(file);
-        const invoice = parseInvoiceXml(xmlText);
+        if (file) {
+          const xmlText = await readFileAsText(file);
+          invoice = parseInvoiceXml(xmlText);
+        }
+
         const shipment = {
           id: crypto.randomUUID(),
           ...tracking,
           ...invoice,
-          fileName: file.name,
+          fileName: file?.name || "Sem XML",
           createdAt: new Intl.DateTimeFormat("pt-BR", {
             dateStyle: "short",
             timeStyle: "short",
@@ -862,7 +898,7 @@
         const shipment = shipments.find((item) => item.id === shipmentId);
 
         if (shipment) {
-          window.open(buildLatamUrl(shipment), "_blank", "noopener");
+          window.open(buildTrackingUrl(shipment), "_blank", "noopener");
         }
       }
 
