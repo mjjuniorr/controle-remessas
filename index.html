@@ -7,21 +7,23 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f3f5f7;
+      --bg: #f1f2f4;
       --panel: #ffffff;
-      --ink: #1d2633;
-      --muted: #66717f;
-      --line: #dfe5eb;
-      --soft: #f8fafc;
-      --brand-blue: #006bb6;
-      --brand-blue-dark: #004d86;
-      --brand-orange: #f28c20;
-      --brand-green: #38a84b;
-      --accent: var(--brand-blue);
-      --accent-dark: var(--brand-blue-dark);
+      --ink: #15171b;
+      --muted: #68707b;
+      --line: #d9dee4;
+      --soft: #f7f8fa;
+      --black: #050607;
+      --graphite: #20242a;
+      --graphite-2: #343941;
+      --orange: #f58220;
+      --orange-dark: #d66b12;
+      --cyan: #16c7f3;
+      --accent: var(--orange);
+      --accent-dark: var(--orange-dark);
       --ok: #168149;
       --warn: #b76512;
-      --focus: #0085d5;
+      --focus: var(--cyan);
     }
 
     * {
@@ -33,7 +35,7 @@
       min-height: 100vh;
       font-family: Arial, Helvetica, sans-serif;
       background:
-        linear-gradient(180deg, rgba(0, 107, 182, 0.10), rgba(243, 245, 247, 0) 260px),
+        linear-gradient(180deg, rgba(5, 6, 7, 0.14), rgba(241, 242, 244, 0) 260px),
         var(--bg);
       color: var(--ink);
     }
@@ -45,9 +47,10 @@
     }
 
     .topbar {
-      background: #1d2633;
+      background: linear-gradient(90deg, var(--black), var(--graphite));
       color: #fff;
       font-size: 13px;
+      border-bottom: 3px solid var(--orange);
     }
 
     .topbar-inner {
@@ -74,11 +77,13 @@
       gap: 16px;
       align-items: center;
       margin-bottom: 20px;
-      padding: 18px;
-      background: var(--panel);
-      border: 1px solid var(--line);
+      padding: 18px 20px;
+      color: #fff;
+      background:
+        linear-gradient(135deg, var(--black), var(--graphite) 58%, var(--graphite-2));
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px;
-      box-shadow: 0 10px 24px rgba(29, 38, 51, 0.08);
+      box-shadow: 0 16px 34px rgba(5, 6, 7, 0.22);
     }
 
     h1,
@@ -89,33 +94,29 @@
     }
 
     h1 {
-      font-size: 24px;
+      font-size: 28px;
       line-height: 1.15;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 18px;
     }
 
-    .brand-mark {
-      width: 58px;
-      min-width: 58px;
-      height: 58px;
+    .brand-logo {
+      width: 172px;
+      min-width: 172px;
+      height: 78px;
       border-radius: 8px;
-      display: grid;
-      place-items: center;
-      color: #fff;
-      font-size: 18px;
-      font-weight: 900;
-      background:
-        linear-gradient(135deg, var(--brand-blue) 0 52%, var(--brand-orange) 52% 75%, var(--brand-green) 75% 100%);
-      box-shadow: inset 0 -8px 0 rgba(0, 0, 0, 0.10);
+      object-fit: contain;
+      background: #000;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
     }
 
     .eyebrow {
-      color: var(--brand-blue);
+      color: var(--orange);
       font-size: 12px;
       font-weight: 900;
       text-transform: uppercase;
@@ -125,7 +126,7 @@
 
     .subtitle {
       margin-top: 6px;
-      color: var(--muted);
+      color: #d9dde3;
       line-height: 1.4;
     }
 
@@ -159,7 +160,7 @@
       font-size: 18px;
       margin-bottom: 14px;
       padding-bottom: 10px;
-      border-bottom: 3px solid var(--brand-orange);
+      border-bottom: 3px solid var(--orange);
     }
 
     form {
@@ -190,7 +191,7 @@
     }
 
     input:focus {
-      outline: 3px solid rgba(37, 99, 235, 0.16);
+      outline: 3px solid rgba(22, 199, 243, 0.18);
       border-color: var(--focus);
     }
 
@@ -214,7 +215,7 @@
 
     button.primary {
       min-height: 46px;
-      color: #fff;
+      color: #15171b;
       background: var(--accent);
     }
 
@@ -224,15 +225,15 @@
 
     button.secondary,
     .link-button {
-      color: var(--brand-blue);
+      color: var(--ink);
       border: 1px solid var(--line);
       background: #fff;
     }
 
     button.secondary:hover,
     .link-button:hover {
-      border-color: rgba(0, 107, 182, 0.38);
-      background: #f2f9ff;
+      border-color: rgba(245, 130, 32, 0.42);
+      background: #fff7ef;
     }
 
     button.danger {
@@ -295,10 +296,12 @@
     }
 
     .tracking-row a {
-      color: var(--brand-blue);
+      color: var(--ink);
       font-size: 14px;
       text-decoration: underline;
       overflow-wrap: anywhere;
+      text-decoration-color: var(--orange);
+      text-underline-offset: 3px;
     }
 
     .copy-button {
@@ -306,7 +309,7 @@
       min-width: 34px;
       min-height: 34px;
       padding: 0;
-      color: var(--brand-blue);
+      color: var(--cyan);
       border: 0;
       background: transparent;
     }
@@ -327,7 +330,7 @@
       font-weight: 800;
       letter-spacing: 0;
       overflow-wrap: anywhere;
-      color: var(--brand-blue-dark);
+      color: var(--ink);
     }
 
     .meta {
@@ -426,23 +429,12 @@
       background: #fff7ed;
     }
 
-    .category-strip {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    .cyan-line {
+      width: 88px;
+      height: 3px;
       margin-top: 12px;
-    }
-
-    .category-strip span {
-      min-height: 26px;
-      display: inline-flex;
-      align-items: center;
       border-radius: 999px;
-      padding: 0 10px;
-      color: var(--brand-blue-dark);
-      background: #eaf6ff;
-      font-size: 12px;
-      font-weight: 800;
+      background: var(--cyan);
     }
 
     @media (max-width: 880px) {
@@ -471,6 +463,13 @@
 
       .brand {
         align-items: start;
+        flex-direction: column;
+      }
+
+      .brand-logo {
+        width: 150px;
+        min-width: 150px;
+        height: 68px;
       }
 
       .actions {
@@ -491,17 +490,12 @@
   <main>
     <header>
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">3DH</div>
+        <img class="brand-logo" src="assets/logo-3dh-manaus.jpeg" alt="3DH Manaus">
         <div>
           <p class="eyebrow">Casa da Impressora 3D</p>
           <h1>Controle de Remessas</h1>
-          <p class="subtitle">Acompanhe rastreios, NF-e e itens enviados para operações de filamentos, peças, impressoras e serviços.</p>
-          <div class="category-strip" aria-label="Categorias atendidas">
-            <span>Filamentos</span>
-            <span>Impressoras 3D</span>
-            <span>Peças</span>
-            <span>Serviços</span>
-          </div>
+          <p class="subtitle">Acompanhe rastreios, NF-e e itens enviados com uma visão simples para operação interna.</p>
+          <div class="cyan-line" aria-hidden="true"></div>
         </div>
       </div>
       <button class="secondary" id="clearAllButton" type="button">Limpar cadastros</button>
