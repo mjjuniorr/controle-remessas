@@ -31,7 +31,7 @@ services:
         condition: on-failure
 
   remessas-web:
-    image: ghcr.io/mjjuniorr/controle-remessas-web:808f865
+    image: ghcr.io/mjjuniorr/controle-remessas-web:e7ad780
     networks:
       - PortainerRede
     deploy:
