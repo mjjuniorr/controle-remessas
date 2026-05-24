@@ -107,13 +107,13 @@ O arquivo `docker-compose.producao-vps.yml` foi preparado para uso como Stack no
 Ele espera que a imagem ja esteja publicada em um registry:
 
 ```text
-APP_IMAGE=ghcr.io/mjjuniorr/controle-remessas-web:producao
+APP_IMAGE=ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
 ```
 
 Variaveis principais:
 
 ```text
-APP_IMAGE=ghcr.io/mjjuniorr/controle-remessas-web:producao
+APP_IMAGE=ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
 APP_HOST=remessas.3dhmanaus.shop
 APP_REPLICAS=1
 TRAEFIK_ENTRYPOINTS=websecure
@@ -157,8 +157,8 @@ docker build -t controle-remessas-web:latest .
 Exemplo para publicar em registry:
 
 ```bash
-docker tag controle-remessas-web:latest ghcr.io/mjjuniorr/controle-remessas-web:producao
-docker push ghcr.io/mjjuniorr/controle-remessas-web:producao
+docker tag controle-remessas-web:latest ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
+docker push ghcr.io/mjjuniorr/controle-remessas-web:ef9e70e
 ```
 
 ## Limitacoes da primeira versao
