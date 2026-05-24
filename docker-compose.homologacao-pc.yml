@@ -1,4 +1,41 @@
 services:
+  remessas-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-controle_remessas}
+      POSTGRES_USER: ${POSTGRES_USER:-controle_remessas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-controle_remessas}
+    volumes:
+      - remessas-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  remessas-api:
+    image: controle-remessas-api:hml
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-controle_remessas}:${POSTGRES_PASSWORD:-controle_remessas}@remessas-db:5432/${POSTGRES_DB:-controle_remessas}
+      APP_PASSWORD: ${APP_PASSWORD:-3dhmanaus}
+      JWT_SECRET: ${JWT_SECRET:-troque_este_segredo}
+      API_TOKEN: ${API_TOKEN:-token_interno_para_n8n}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    depends_on:
+      remessas-db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   remessas-web:
     image: controle-remessas-web:hml
     build:
@@ -6,9 +43,15 @@ services:
       dockerfile: Dockerfile
     ports:
       - "${APP_PORT:-4173}:80"
+    depends_on:
+      remessas-api:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"]
       interval: 30s
       timeout: 5s
       retries: 3
+
+volumes:
+  remessas-db-data:

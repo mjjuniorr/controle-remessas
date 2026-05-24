@@ -1,6 +1,6 @@
 # Controle de Remessas
 
-Sistema simples para cadastrar rastreios de envio, anexar o XML da nota fiscal e consultar quais itens foram enviados em cada rastreio.
+Sistema simples para cadastrar rastreios de envio, anexar o XML da nota fiscal e consultar quais itens foram enviados em cada rastreio. Os dados ficam em banco compartilhado e o acesso e protegido por senha.
 
 ## Requisitos
 
@@ -51,9 +51,11 @@ Sistema simples para cadastrar rastreios de envio, anexar o XML da nota fiscal e
 
 ### Persistencia dos dados
 
-- Os cadastros devem ficar salvos no navegador.
-- O sistema deve permitir limpar todos os cadastros.
-- Nesta primeira versao, nao ha login, servidor ou banco de dados externo.
+- Os cadastros devem ficar salvos em banco de dados centralizado.
+- Todos os usuarios autenticados devem visualizar a mesma base de rastreios.
+- A senha deve proteger o acesso ao sistema.
+- O sistema deve permitir importar cadastros antigos que ainda existam no navegador.
+- O sistema deve permitir limpar todos os cadastros compartilhados.
 
 ## Tecnologia utilizada
 
@@ -62,7 +64,10 @@ Sistema simples para cadastrar rastreios de envio, anexar o XML da nota fiscal e
 - **JavaScript puro**: regras de cadastro, leitura da nota, busca e interacao da tela.
 - **DOMParser**: leitura e interpretacao do XML da NF-e.
 - **FileReader API**: leitura do arquivo XML selecionado pelo usuario.
-- **localStorage**: armazenamento local dos rastreios cadastrados no navegador.
+- **localStorage**: armazenamento temporario do token e apoio para importar cadastros antigos do navegador.
+- **Node.js**: backend da API.
+- **PostgreSQL**: banco de dados centralizado dos rastreios.
+- **pg**: driver PostgreSQL usado pela API Node.
 - **LATAM Cargo Tracking URL**: abertura do rastreio oficial LATAM em outra aba.
 - **Correios Tracking URL**: abertura do rastreio oficial Correios em outra aba.
 - **Docker**: empacotamento da aplicacao para homologacao e producao.
@@ -74,6 +79,9 @@ Sistema simples para cadastrar rastreios de envio, anexar o XML da nota fiscal e
 ## Arquivos do projeto
 
 - `index.html`: aplicacao principal.
+- `api/server.js`: backend com autenticacao e persistencia dos rastreios.
+- `api/Dockerfile`: imagem Docker da API.
+- `api/package.json`: dependencias da API.
 - `sample-nfe.xml`: XML de exemplo para teste de cadastro.
 - `README.md`: documentacao do projeto.
 - `Dockerfile`: imagem Docker da aplicacao.
@@ -112,6 +120,7 @@ Ele usa a imagem de producao ja publicada no GHCR:
 
 ```text
 ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
+ghcr.io/mjjuniorr/controle-remessas-api:e5d7e78
 ```
 
 Variaveis principais:
@@ -119,6 +128,12 @@ Variaveis principais:
 ```text
 APP_HOST=remessas.3dhmanaus.shop
 APP_REPLICAS=1
+POSTGRES_DB=controle_remessas
+POSTGRES_USER=controle_remessas
+POSTGRES_PASSWORD=senha_do_banco
+APP_PASSWORD=senha_de_acesso_do_sistema
+JWT_SECRET=segredo_para_assinar_login
+API_TOKEN=token_interno_para_n8n
 TRAEFIK_ENTRYPOINTS=websecure
 TRAEFIK_CERTRESOLVER=letsencryptresolver
 TRAEFIK_PRIORITY=1
@@ -151,10 +166,16 @@ traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Prot
 
 ## Build da imagem
 
-Build local:
+Build local do frontend:
 
 ```bash
 docker build -t controle-remessas-web:latest .
+```
+
+Build local da API:
+
+```bash
+docker build -t controle-remessas-api:latest ./api
 ```
 
 Exemplo para publicar em registry:
@@ -162,21 +183,38 @@ Exemplo para publicar em registry:
 ```bash
 docker tag controle-remessas-web:latest ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
 docker push ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
+docker tag controle-remessas-api:latest ghcr.io/mjjuniorr/controle-remessas-api:e5d7e78
+docker push ghcr.io/mjjuniorr/controle-remessas-api:e5d7e78
 ```
 
-## Limitacoes da primeira versao
+## API interna
+
+O N8N pode consultar a API pela rede interna `PortainerRede`, usando o token `API_TOKEN`:
+
+```text
+GET http://remessas-api:3000/api/shipments
+Authorization: Bearer token_interno_para_n8n
+```
+
+Endpoints principais:
+
+- `POST /api/login`: autentica o frontend com a senha `APP_PASSWORD`.
+- `GET /api/me`: valida o token de login.
+- `GET /api/shipments`: lista todos os rastreios cadastrados.
+- `POST /api/shipments`: cadastra ou atualiza um rastreio.
+- `POST /api/shipments/import`: importa cadastros antigos do navegador.
+- `DELETE /api/shipments/:id`: remove um rastreio.
+- `DELETE /api/shipments`: limpa todos os rastreios.
+
+## Limitacoes atuais
 
 - O sistema trabalha com XML da NF-e, nao com PDF/DANFE.
-- Os dados ficam salvos apenas no navegador usado.
-- Se o cache ou dados do navegador forem limpos, os cadastros tambem sao removidos.
-- Nao ha controle de usuarios.
-- Nao ha banco de dados centralizado.
-- Em producao, os dados continuam ficando no navegador do usuario, pois a primeira versao e 100% frontend.
+- A senha protege o acesso, mas todos os usuarios autenticados acessam a mesma base.
+- O sistema ainda nao consulta automaticamente o status em LATAM Cargo ou Correios.
+- O rastreio oficial continua abrindo em outra aba.
 
 ## Proximas melhorias sugeridas
 
-- Criar um backend com banco de dados.
-- Permitir login de usuarios.
 - Exportar lista de rastreios e itens para Excel.
 - Adicionar status manual do envio.
 - Permitir anexar mais de uma nota fiscal no mesmo rastreio.

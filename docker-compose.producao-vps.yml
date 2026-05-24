@@ -1,4 +1,35 @@
 services:
+  remessas-db:
+    image: postgres:16-alpine
+    networks:
+      - PortainerRede
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-controle_remessas}
+      POSTGRES_USER: ${POSTGRES_USER:-controle_remessas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - remessas-db-data:/var/lib/postgresql/data
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  remessas-api:
+    image: ghcr.io/mjjuniorr/controle-remessas-api:e5d7e78
+    networks:
+      - PortainerRede
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-controle_remessas}:${POSTGRES_PASSWORD}@remessas-db:5432/${POSTGRES_DB:-controle_remessas}
+      APP_PASSWORD: ${APP_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      API_TOKEN: ${API_TOKEN}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
   remessas-web:
     image: ghcr.io/mjjuniorr/controle-remessas-web:e5d7e78
     networks:
@@ -25,3 +56,6 @@ networks:
   PortainerRede:
     external: true
     name: PortainerRede
+
+volumes:
+  remessas-db-data:
