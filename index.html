@@ -232,9 +232,9 @@
       font-weight: 700;
     }
 
-    input {
+    input,
+    textarea {
       width: 100%;
-      min-height: 44px;
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 0 12px;
@@ -243,11 +243,22 @@
       background: #fff;
     }
 
+    input {
+      min-height: 44px;
+    }
+
+    textarea {
+      min-height: 92px;
+      padding-top: 11px;
+      resize: vertical;
+    }
+
     input[type="file"] {
       padding: 10px 12px;
     }
 
-    input:focus {
+    input:focus,
+    textarea:focus {
       outline: 3px solid rgba(22, 199, 243, 0.18);
       border-color: var(--focus);
     }
@@ -584,6 +595,11 @@
             <input id="invoiceFile" name="invoiceFile" type="file" accept=".xml,text/xml,application/xml">
           </label>
 
+          <label for="manualItems">
+            Itens enviados
+            <textarea id="manualItems" name="manualItems" placeholder="Descricao do material enviado pelos Correios"></textarea>
+          </label>
+
           <button class="primary" type="submit">Cadastrar rastreio</button>
         </form>
 
@@ -625,6 +641,7 @@
     const shipmentForm = document.querySelector("#shipmentForm");
     const trackingInput = document.querySelector("#trackingCode");
     const invoiceInput = document.querySelector("#invoiceFile");
+    const manualItemsInput = document.querySelector("#manualItems");
     const formMessage = document.querySelector("#formMessage");
     const shipmentsContainer = document.querySelector("#shipments");
     const logoutButton = document.querySelector("#logoutButton");
@@ -805,6 +822,20 @@
         issuer,
         items,
       };
+    }
+
+    function parseManualItems(text) {
+      return text
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((description, index) => ({
+          line: String(index + 1),
+          code: "-",
+          description,
+          quantity: "1",
+          unit: "UN",
+        }));
     }
 
     function formatQuantity(value) {
@@ -1008,6 +1039,14 @@
         if (file) {
           const xmlText = await readFileAsText(file);
           invoice = parseInvoiceXml(xmlText);
+        }
+
+        if (!file && tracking.carrier === "Correios") {
+          invoice.items = parseManualItems(manualItemsInput.value);
+
+          if (!invoice.items.length) {
+            throw new Error("Informe a descricao do material enviado pelos Correios.");
+          }
         }
 
         const shipment = {

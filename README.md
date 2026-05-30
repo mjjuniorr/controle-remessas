@@ -21,6 +21,7 @@ Sistema simples para cadastrar rastreios de envio, anexar o XML da nota fiscal e
 
 - Para rastreios LATAM Cargo, o usuario deve anexar o XML da NF-e referente ao material enviado.
 - Para rastreios dos Correios, o XML da NF-e nao deve ser obrigatorio.
+- Para rastreios dos Correios sem XML, o usuario deve informar manualmente a descricao dos itens enviados.
 - O sistema deve ler o XML diretamente no navegador.
 - O sistema deve extrair:
   - numero da nota fiscal;
